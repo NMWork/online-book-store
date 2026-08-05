@@ -56,8 +56,8 @@ public class ProductServiceImpl implements ProductService {
 
         updateProductFields(product, request);
 
-        Product updatedProduct = productRepository.saveAndFlush(product);
-        return prepareProductResponse(updatedProduct);
+        return prepareProductResponse(product);
+
     }
 
     @Transactional
