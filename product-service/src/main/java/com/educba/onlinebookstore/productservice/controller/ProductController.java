@@ -5,6 +5,7 @@ import com.educba.onlinebookstore.productservice.dto.ProductResponse;
 import com.educba.onlinebookstore.productservice.service.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +22,9 @@ public class ProductController {
     public ProductController(ProductService productService) {
         this.productService = productService;
     }
+
+    @Value("${server.port}")
+    private String serverPort;
 
     @PostMapping ("/products")
     public ResponseEntity<ProductResponse>  addProduct(@Valid @RequestBody ProductRequest productRequest) {
@@ -56,6 +60,11 @@ public class ProductController {
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/products/instance")
+    public String getInstance() {
+        return "Request handled by Product Service running on port: " + serverPort;
     }
 
 }
