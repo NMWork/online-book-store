@@ -12,7 +12,7 @@ public class ProductClient {
     private final RestClient restClient;
 
     public ProductClient(RestClient.Builder restClientBuilder) {
-        this.restClient = restClientBuilder .baseUrl("http://localhost:8081") .build();
+        this.restClient = restClientBuilder.baseUrl("http://product-service").build();
     }
 
     public ProductResponse getProduct(Long id) {
