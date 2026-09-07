@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/products")
 public class ProductController {
 
     ProductService productService;
@@ -26,7 +26,7 @@ public class ProductController {
     @Value("${server.port}")
     private String serverPort;
 
-    @PostMapping ("/products")
+    @PostMapping
     public ResponseEntity<ProductResponse>  addProduct(@Valid @RequestBody ProductRequest productRequest) {
         ProductResponse response = productService.createProduct(productRequest);
         return ResponseEntity
@@ -34,13 +34,13 @@ public class ProductController {
                 .body(response);
     }
 
-    @GetMapping ("/products")
+    @GetMapping
     public ResponseEntity<List<ProductResponse>> getProducts() {
         List<ProductResponse> response = productService.getAllProducts();
         return  ResponseEntity.ok(response);
     }
 
-    @GetMapping ("/products/{id}")
+    @GetMapping ("/{id}")
     public ResponseEntity<ProductResponse> getProduct(@PathVariable Long id) {
        ProductResponse response = productService.getProductById(id);
        return ResponseEntity
@@ -48,7 +48,7 @@ public class ProductController {
                .body(response);
     }
 
-    @PutMapping ("/products/{id}")
+    @PutMapping ("/{id}")
     public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long id, @Valid @RequestBody ProductRequest productRequest) {
         ProductResponse response = productService.updateProduct(id, productRequest);
         return ResponseEntity
@@ -56,13 +56,13 @@ public class ProductController {
                .body(response);
     }
 
-    @DeleteMapping ("/products/{id}")
+    @DeleteMapping ("/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/products/instance")
+    @GetMapping("/instance")
     public String getInstance() {
         return "Request handled by Product Service running on port: " + serverPort;
     }

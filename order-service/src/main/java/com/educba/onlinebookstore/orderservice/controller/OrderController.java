@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/orders")
 public class OrderController {
 
     private final OrderService orderService;
@@ -20,29 +20,29 @@ public class OrderController {
         this.orderService = orderService;
     }
 
-    @PostMapping("/orders")
+    @PostMapping
     public ResponseEntity<OrderResponse> createOrder(@Valid @RequestBody OrderRequest orderRequest) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(orderService.createOrder(orderRequest));
     }
 
-    @GetMapping("/orders")
+    @GetMapping
     public ResponseEntity<List<OrderResponse>> getAllOrders() {
         return ResponseEntity.ok(orderService.getAllOrders());
     }
 
-    @GetMapping("/orders/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<OrderResponse> getOrder(@PathVariable Long id) {
         return ResponseEntity.ok(orderService.getOrderById(id));
     }
 
-    @PatchMapping("/orders/{id}/status")
+    @PatchMapping("/{id}/status")
     public ResponseEntity<OrderResponse> updateOrderStatus(@PathVariable Long id, @Valid @RequestBody UpdateOrderStatusRequest updateOrderStatusRequest) {
         return ResponseEntity.ok(orderService.updateOrderStatus(id, updateOrderStatusRequest.status()));
     }
 
-    @DeleteMapping("/orders/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<OrderResponse> deleteOrder(@PathVariable Long id) {
         orderService.deleteOrder(id);
         return ResponseEntity.noContent().build();
