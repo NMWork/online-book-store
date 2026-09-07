@@ -1,10 +1,7 @@
 package com.educba.onlinebookstore.orderservice.service;
 
 import com.educba.onlinebookstore.orderservice.constants.OrderStatus;
-import com.educba.onlinebookstore.orderservice.dto.OrderItemRequest;
-import com.educba.onlinebookstore.orderservice.dto.OrderItemResponse;
-import com.educba.onlinebookstore.orderservice.dto.OrderRequest;
-import com.educba.onlinebookstore.orderservice.dto.OrderResponse;
+import com.educba.onlinebookstore.orderservice.dto.*;
 import com.educba.onlinebookstore.orderservice.entity.Order;
 import com.educba.onlinebookstore.orderservice.entity.OrderItem;
 import com.educba.onlinebookstore.orderservice.exception.OrderNotFoundException;
@@ -23,9 +20,11 @@ import java.util.Map;
 public class OrderServiceImpl implements OrderService{
 
     private final OrderRepository orderRepository;
+    private final ProductClient productClient;
 
-    public OrderServiceImpl(OrderRepository orderRepository) {
+    public OrderServiceImpl(OrderRepository orderRepository, ProductClient productClient) {
         this.orderRepository = orderRepository;
+        this.productClient = productClient;
     }
 
     @Override
@@ -96,18 +95,11 @@ public class OrderServiceImpl implements OrderService{
     }
 
     private BigDecimal prepareUnitPrice(Long productId) {
-        if(!PRODUCT_PRICES.containsKey(productId)) {
+        ProductResponse productResponse = productClient.getProduct(productId);
+        if (productResponse == null) {
             throw new ProductNotFoundException(productId);
         }
-        BigDecimal unitPrice =
-                PRODUCT_PRICES.get(productId);
-
-        if (unitPrice == null) {
-            throw new IllegalArgumentException(
-                    "Invalid Product Id");
-        }
-
-        return unitPrice;
+        return productResponse.price();
     }
 
     private OrderResponse prepareOrderResponse(Order order) {
