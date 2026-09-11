@@ -1,4 +1,4 @@
-package com.educba.onlinebookstore.orderservice.exception;
+package com.educba.onlinebookstore.authservice.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -8,7 +8,6 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -17,36 +16,37 @@ import java.util.Map;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-    @ExceptionHandler(OrderNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleProductNotFound(
-            OrderNotFoundException ex,
+
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleUserAlreadyExistsException(
+            UserAlreadyExistsException ex,
             HttpServletRequest request) {
 
         return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
+                .status(HttpStatus.CONFLICT)
                 .body(
                         ErrorResponse.builder()
                                 .timestamp(LocalDateTime.now())
-                                .status(404)
-                                .error("Not Found")
+                                .status(409)
+                                .error("User Already Exists")
                                 .message(ex.getMessage())
                                 .path(request.getRequestURI())
                                 .build()
                 );
     }
 
-    @ExceptionHandler(ProductNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleProductNotFound(
-            ProductNotFoundException ex,
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidCredentialsException(
+            InvalidCredentialsException ex,
             HttpServletRequest request) {
 
         return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
+                .status(HttpStatus.UNAUTHORIZED)
                 .body(
                         ErrorResponse.builder()
                                 .timestamp(LocalDateTime.now())
-                                .status(404)
-                                .error("Not Found")
+                                .status(401)
+                                .error("Invalid Credentials")
                                 .message(ex.getMessage())
                                 .path(request.getRequestURI())
                                 .build()
@@ -69,23 +69,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .badRequest()
                 .body(errors);
-
-    }
-
-    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<ErrorResponse> handleException(MethodArgumentTypeMismatchException ex, HttpServletRequest request) {
-
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(
-                        ErrorResponse.builder()
-                                .timestamp(LocalDateTime.now())
-                                .status(400)
-                                .error("Method argument type mismatch")
-                                //.message(ex.getMessage())
-                                .path(request.getRequestURI())
-                                .build()
-                );
 
     }
 
@@ -122,4 +105,5 @@ public class GlobalExceptionHandler {
                 );
 
     }
+
 }

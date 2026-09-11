@@ -19,7 +19,9 @@ public class ProductClient {
         return restClient.get()
                 .uri("/api/products/{id}", id)
                 .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, (req, res) -> { throw new ProductNotFoundException(id); })
+                .onStatus(HttpStatusCode::is4xxClientError, (req, res) -> {
+                    throw new ProductNotFoundException(id);
+                })
                 .body(ProductResponse.class);
     }
 

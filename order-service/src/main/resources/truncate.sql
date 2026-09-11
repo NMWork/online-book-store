@@ -1,0 +1,7 @@
+use order_db;
+SET FOREIGN_KEY_CHECKS = 0;
+
+TRUNCATE TABLE order_items;
+TRUNCATE TABLE orders;
+
+SET FOREIGN_KEY_CHECKS = 1;
