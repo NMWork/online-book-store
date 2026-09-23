@@ -7,6 +7,8 @@ import com.educba.onlinebookstore.orderservice.service.OrderService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,10 +23,12 @@ public class OrderController {
     }
 
     @PostMapping
-    public ResponseEntity<OrderResponse> createOrder(@Valid @RequestBody OrderRequest orderRequest) {
+    public ResponseEntity<OrderResponse> createOrder(@Valid @RequestBody OrderRequest orderRequest, @AuthenticationPrincipal Jwt jwt) throws Exception {
+        Long userId = jwt.getClaim("userId");
+
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(orderService.createOrder(orderRequest));
+                .body(orderService.createOrder(orderRequest, userId, jwt.getTokenValue()));
     }
 
     @GetMapping
