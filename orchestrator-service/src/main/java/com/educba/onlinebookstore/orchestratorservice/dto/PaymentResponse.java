@@ -1,6 +1,7 @@
-package com.educba.onlinebookstore.orderservice.dto;
+package com.educba.onlinebookstore.orchestratorservice.dto;
 
-import com.educba.onlinebookstore.orderservice.constants.PaymentStatus;
+
+import com.educba.onlinebookstore.orchestratorservice.constants.PaymentStatus;
 
 import java.math.BigDecimal;
 

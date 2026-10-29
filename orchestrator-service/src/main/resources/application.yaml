@@ -1,0 +1,37 @@
+spring:
+  application:
+    name: orchestrator-service
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/saga_db?createDatabaseIfNotExist=true
+    username: root
+    password: root
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format-sql: true
+        dialect: org.hibernate.dialect.MySQL8Dialect
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+      fetch-registry: true
+      register-with-eureka: true
+  instance:
+    prefer-ip-address: true
+
+server:
+  port: 8087
+
+jwt:
+  secret: AzuO7Gnu7VUAHzzkNnb4w0BiOnMXfR2aviP80gCkp+U=
+
+logging:
+  level:
+    org.springframework.cloud.loadbalancer: DEBUG
+    com.netflix.discovery: DEBUG

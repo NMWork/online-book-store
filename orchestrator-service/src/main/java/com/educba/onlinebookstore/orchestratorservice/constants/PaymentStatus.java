@@ -1,4 +1,4 @@
-package com.educba.onlinebookstore.orderservice.constants;
+package com.educba.onlinebookstore.orchestratorservice.constants;
 
 public enum PaymentStatus {
     PENDING,
