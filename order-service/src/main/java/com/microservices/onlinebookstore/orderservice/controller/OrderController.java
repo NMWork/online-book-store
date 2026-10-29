@@ -1,0 +1,59 @@
+package com.microservices.onlinebookstore.orderservice.controller;
+
+import com.microservices.onlinebookstore.orderservice.constants.OrderStatus;
+import com.microservices.onlinebookstore.orderservice.dto.OrderRequest;
+import com.microservices.onlinebookstore.orderservice.dto.OrderResponse;
+import com.microservices.onlinebookstore.orderservice.dto.UpdateOrderStatusRequest;
+import com.microservices.onlinebookstore.orderservice.service.OrderService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/orders")
+public class OrderController {
+
+    private final OrderService orderService;
+    public OrderController(OrderService orderService) {
+        this.orderService = orderService;
+    }
+
+    @PostMapping
+    public ResponseEntity<OrderResponse> createOrder(@Valid @RequestBody OrderRequest orderRequest, @AuthenticationPrincipal Jwt jwt) throws Exception {
+        Long userId = jwt.getClaim("userId");
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(orderService.createOrder(orderRequest, userId));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<OrderResponse>> getAllOrders(@RequestParam(required = false) OrderStatus status) {
+        if(status != null) {
+            return ResponseEntity.ok(orderService.getAllOrdersByStatus(status));
+        }
+        return ResponseEntity.ok(orderService.getAllOrders());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<OrderResponse> getOrder(@PathVariable Long id) {
+        return ResponseEntity.ok(orderService.getOrderById(id));
+    }
+
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<OrderResponse> updateOrderStatus(@PathVariable Long id, @Valid @RequestBody UpdateOrderStatusRequest updateOrderStatusRequest) {
+        return ResponseEntity.ok(orderService.updateOrderStatus(id, updateOrderStatusRequest.status()));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<OrderResponse> deleteOrder(@PathVariable Long id) {
+        orderService.deleteOrder(id);
+        return ResponseEntity.noContent().build();
+    }
+
+}
