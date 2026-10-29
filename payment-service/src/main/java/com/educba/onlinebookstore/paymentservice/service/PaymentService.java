@@ -5,8 +5,9 @@ import com.educba.onlinebookstore.paymentservice.dto.PaymentResponse;
 
 public interface PaymentService {
 
-    PaymentResponse createPayment(PaymentRequest request, String tokenValue);
+    PaymentResponse createPayment(PaymentRequest request);
     PaymentResponse getPaymentById(Long id);
     PaymentResponse getPaymentByOrderId(Long orderId);
+    PaymentResponse reconcilePayment(Long orderId);
 
 }

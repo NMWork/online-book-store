@@ -1,7 +1,6 @@
 package com.educba.onlinebookstore.orderservice.service;
 
 import com.educba.onlinebookstore.orderservice.constants.OrderStatus;
-import com.educba.onlinebookstore.orderservice.constants.PaymentStatus;
 import com.educba.onlinebookstore.orderservice.dto.*;
 import com.educba.onlinebookstore.orderservice.entity.Order;
 import com.educba.onlinebookstore.orderservice.entity.OrderItem;
@@ -15,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @Slf4j
@@ -23,43 +21,17 @@ public class OrderServiceImpl implements OrderService{
 
     private final OrderRepository orderRepository;
     private final ProductClient productClient;
-    private final PaymentClient paymentClient;
 
-    public OrderServiceImpl(OrderRepository orderRepository, ProductClient productClient, PaymentClient paymentClient) {
+    public OrderServiceImpl(OrderRepository orderRepository, ProductClient productClient) {
         this.orderRepository = orderRepository;
         this.productClient = productClient;
-        this.paymentClient = paymentClient;
     }
 
     @Override
-    public OrderResponse createOrder(OrderRequest request, Long userId, String tokenValue) {
+    public OrderResponse createOrder(OrderRequest request, Long userId) {
         Order order = prepareOrder(request, OrderStatus.CREATED, userId);
         Order savedOrder = orderRepository.save(order);
-
-        updateOrderStatusAfterPayment(savedOrder, request.paymentMethod(),  tokenValue);
-
-        Order finalOrder = orderRepository.save(savedOrder);
-
-        return prepareOrderResponse(finalOrder);
-    }
-
-    private void updateOrderStatusAfterPayment(Order order, String paymentMethod, String token) {
-        try {
-            PaymentRequest paymentRequest = new PaymentRequest(
-                    order.getId(), order.getTotalAmount(), paymentMethod);
-
-            PaymentResponse paymentResponse = paymentClient.createPayment(paymentRequest, token);
-
-            order.setStatus(
-                    PaymentStatus.SUCCESS.equals(paymentResponse.status())
-                            ? OrderStatus.CONFIRMED
-                            : OrderStatus.PAYMENT_FAILED
-            );
-
-        } catch (Exception ex) {
-            log.error("Payment call failed for order {}", order.getId(), ex);
-            order.setStatus(OrderStatus.PAYMENT_FAILED);
-        }
+        return prepareOrderResponse(savedOrder);
     }
 
     @Transactional(readOnly = true)
@@ -80,9 +52,13 @@ public class OrderServiceImpl implements OrderService{
     @Transactional
     @Override
     public OrderResponse updateOrderStatus(Long id, OrderStatus status) {
-        Order order = orderRepository.findById(id).orElseThrow(() -> new OrderNotFoundException(id));
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new OrderNotFoundException(id));
+
         order.setStatus(status);
-        return prepareOrderResponse(order);
+        Order updatedOrder = orderRepository.save(order);
+
+        return prepareOrderResponse(updatedOrder);
     }
 
     @Transactional
@@ -90,6 +66,13 @@ public class OrderServiceImpl implements OrderService{
     public void deleteOrder(Long id) {
         Order order = orderRepository.findById(id).orElseThrow(() -> new OrderNotFoundException(id));
         orderRepository.delete(order);
+    }
+
+    @Override
+    public List<OrderResponse> getAllOrdersByStatus(OrderStatus status) {
+        return orderRepository.findByStatus(status).stream()
+                .map(this :: prepareOrderResponse)
+                .toList();
     }
 
     private Order prepareOrder(OrderRequest request, OrderStatus status, Long customerId) {

@@ -10,7 +10,13 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "payments")
+@Table(
+        name = "payments",
+        uniqueConstraints = @UniqueConstraint(
+                name = "uk_payment_order_id",
+                columnNames = "order_id"
+        )
+)
 @Getter
 @Setter
 @Builder
@@ -22,8 +28,11 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "order_id", nullable = false)
     private Long orderId;
+
+    @Version
+    private Long version;
 
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal amount;

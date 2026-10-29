@@ -1,5 +1,6 @@
 package com.educba.onlinebookstore.orderservice.controller;
 
+import com.educba.onlinebookstore.orderservice.constants.OrderStatus;
 import com.educba.onlinebookstore.orderservice.dto.OrderRequest;
 import com.educba.onlinebookstore.orderservice.dto.OrderResponse;
 import com.educba.onlinebookstore.orderservice.dto.UpdateOrderStatusRequest;
@@ -28,11 +29,14 @@ public class OrderController {
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(orderService.createOrder(orderRequest, userId, jwt.getTokenValue()));
+                .body(orderService.createOrder(orderRequest, userId));
     }
 
     @GetMapping
-    public ResponseEntity<List<OrderResponse>> getAllOrders() {
+    public ResponseEntity<List<OrderResponse>> getAllOrders(@RequestParam(required = false) OrderStatus status) {
+        if(status != null) {
+            return ResponseEntity.ok(orderService.getAllOrdersByStatus(status));
+        }
         return ResponseEntity.ok(orderService.getAllOrders());
     }
 

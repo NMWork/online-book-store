@@ -124,22 +124,6 @@ public class GlobalExceptionHandler {
 
     }
 
-    @ExceptionHandler(OrderNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleOrderNotFound(
-            OrderNotFoundException ex,
-            HttpServletRequest request) {
 
-        return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body(
-                        ErrorResponse.builder()
-                                .timestamp(LocalDateTime.now())
-                                .status(404)
-                                .error("Not Found")
-                                .message(ex.getMessage())
-                                .path(request.getRequestURI())
-                                .build()
-                );
-    }
 
 }

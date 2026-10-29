@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface OrderService {
 
-    OrderResponse createOrder(OrderRequest request, Long userId, String tokenValue);
+    OrderResponse createOrder(OrderRequest request, Long userId);
 
     OrderResponse getOrderById(Long id);
 
@@ -18,4 +18,5 @@ public interface OrderService {
 
     void deleteOrder(Long id);
 
+    List<OrderResponse> getAllOrdersByStatus(OrderStatus status);
 }

@@ -7,22 +7,34 @@ spring:
       server:
         webmvc:
           routes:
+
             - id: product-service
               uri: lb://product-service
               predicates:
                 - Path=/api/products/**
+
+            - id: order-orchestrator
+              uri: lb://orchestrator-service
+              predicates:
+                - Path=/api/orders
+                - Method=POST
+
             - id: order-service
               uri: lb://order-service
               predicates:
                 - Path=/api/orders/**
+
             - id: auth-service
               uri: lb://auth-service
               predicates:
                 - Path=/api/auth/**
-            - id: payment-service
-              uri: lb://payment-service
+
+            - id: payment-recovery
+              uri: lb://orchestrator-service
               predicates:
-                - Path=/api/payments/**
+                - Path=/api/recovery/payments
+                - Method=POST
+
 
 server:
   port: 8080
