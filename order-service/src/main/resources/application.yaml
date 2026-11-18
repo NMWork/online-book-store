@@ -15,6 +15,18 @@ spring:
       hibernate:
         format-sql: true
 
+  kafka:
+    bootstrap-servers: localhost:9092
+    template:
+      default-topic: order-events
+    producer:
+      acks: all
+      properties:
+        enable:
+          idempotence: true
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
 server:
   port: 8082
 
@@ -25,4 +37,7 @@ eureka:
       defaultZone: http://localhost:8761/eureka/
 jwt:
   secret: AzuO7Gnu7VUAHzzkNnb4w0BiOnMXfR2aviP80gCkp+U=
+
+
+
 

@@ -8,7 +8,7 @@
 		<version>3.5.4</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.educba</groupId>
+	<groupId>com.microservices</groupId>
 	<artifactId>online-book-store</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<name>Online Book Store</name>
@@ -62,5 +62,6 @@
         <module>auth-service</module>
         <module>payment-service</module>
         <module>orchestrator-service</module>
+        <module>notification-service</module>
     </modules>
 </project>

@@ -5,8 +5,10 @@ import com.microservices.onlinebookstore.orderservice.dto.*;
 import com.microservices.onlinebookstore.orderservice.dto.*;
 import com.microservices.onlinebookstore.orderservice.entity.Order;
 import com.microservices.onlinebookstore.orderservice.entity.OrderItem;
+import com.microservices.onlinebookstore.orderservice.event.OrderCreatedEvent;
 import com.microservices.onlinebookstore.orderservice.exception.OrderNotFoundException;
 import com.microservices.onlinebookstore.orderservice.exception.ProductNotFoundException;
+import com.microservices.onlinebookstore.orderservice.messaging.OrderEventProducer;
 import com.microservices.onlinebookstore.orderservice.repository.OrderRepository;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.extern.slf4j.Slf4j;
@@ -22,16 +24,22 @@ public class OrderServiceImpl implements OrderService{
 
     private final OrderRepository orderRepository;
     private final ProductClient productClient;
+    private final OrderEventProducer orderEventProducer;
 
-    public OrderServiceImpl(OrderRepository orderRepository, ProductClient productClient) {
+    public OrderServiceImpl(OrderRepository orderRepository, ProductClient productClient
+            , OrderEventProducer orderEventProducer) {
         this.orderRepository = orderRepository;
         this.productClient = productClient;
+        this.orderEventProducer = orderEventProducer;
     }
 
     @Override
     public OrderResponse createOrder(OrderRequest request, Long userId) {
         Order order = prepareOrder(request, OrderStatus.CREATED, userId);
         Order savedOrder = orderRepository.save(order);
+
+        publishOrderCreatedEvent(savedOrder);
+
         return prepareOrderResponse(savedOrder);
     }
 
@@ -140,6 +148,24 @@ public class OrderServiceImpl implements OrderService{
                 .quantity(item.getQuantity())
                 .unitPrice(item.getUnitPrice())
                 .build();
+    }
+
+    private void publishOrderCreatedEvent(Order savedOrder){
+        OrderCreatedEvent event = new OrderCreatedEvent(
+                savedOrder.getId(),
+                savedOrder.getCustomerId(),
+                savedOrder.getStatus(),
+                savedOrder.getTotalAmount(),
+                savedOrder.getCreatedAt(),
+                savedOrder.getItems().stream()
+                        .map(item -> new OrderCreatedEvent.OrderItemEvent(
+                                item.getProductId(),
+                                item.getQuantity(),
+                                item.getUnitPrice()
+                        ))
+                        .toList()
+        );
+        orderEventProducer.publishOrderCreated(event);
     }
 
 }
